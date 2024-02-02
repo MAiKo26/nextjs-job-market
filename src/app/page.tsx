@@ -1,6 +1,7 @@
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import JobListItem from "@/components/JobListItem";
+import JobFilterSidebar from "@/components/JobFilterSidebar";
 export default async function Home() {
   const jobs = await prisma.job.findMany({
     where: { approved: true },
@@ -14,8 +15,9 @@ export default async function Home() {
         </h1>
         <p className="text-muted-foreground">Search for your next job.</p>
       </div>
-      <section>
-        <div className="space-y-4">
+      <section className="flex flex-col gap-4 md:flex-row ">
+        <JobFilterSidebar />
+        <div className="grow space-y-4">
           {jobs.map((job, index) => (
             <JobListItem job={job} key={index} />
           ))}
