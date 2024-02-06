@@ -1,12 +1,25 @@
-import Image from "next/image";
-import prisma from "@/lib/prisma";
-import JobListItem from "@/components/JobListItem";
 import JobFilterSidebar from "@/components/JobFilterSidebar";
-export default async function Home() {
-  const jobs = await prisma.job.findMany({
-    where: { approved: true },
-    orderBy: { createdAt: "desc" },
-  });
+import JobResult from "@/components/JobResult";
+import { jobFilteredSchema } from "@/lib/validation";
+
+interface HomeProps {
+  searchParams: {
+    q?: string;
+    type?: string;
+    location?: string;
+    remote?: string;
+  };
+}
+export default async function Home({
+  searchParams: { q, type, location, remote },
+}: HomeProps) {
+  const filteredValues: jobFilteredSchema = {
+    q,
+    type,
+    location,
+    remote: remote === "true",
+  };
+
   return (
     <main className="m-auto my-10 max-w-5xl space-y-10 px-3">
       <div className="space-y-5 text-center">
@@ -16,12 +29,8 @@ export default async function Home() {
         <p className="text-muted-foreground">Search for your next job.</p>
       </div>
       <section className="flex flex-col gap-4 md:flex-row ">
-        <JobFilterSidebar />
-        <div className="grow space-y-4">
-          {jobs.map((job, index) => (
-            <JobListItem job={job} key={index} />
-          ))}
-        </div>
+        <JobFilterSidebar defaultValues={filteredValues} />
+        <JobResult filteredValues={filteredValues} />
       </section>
     </main>
   );
