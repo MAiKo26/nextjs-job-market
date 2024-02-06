@@ -2,11 +2,27 @@ import prisma from "@/lib/prisma";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import Select from "./ui/select";
+import { jobTypes } from "@/lib/job-types";
+import { Button } from "./ui/button";
+import { jobFilteredSchema } from "@/lib/validation";
+import { redirect } from "next/navigation";
 
 interface JobFilterSidebarProps {}
 
 async function filterJobs(formData: FormData) {
   "use server";
+  const result = Object.fromEntries(formData.entries());
+  const parseResult = jobFilteredSchema.parse(result);
+  const { q, type, location, remote } = parseResult;
+
+  const searchParams = new URLSearchParams({
+    ...(q && { q: q.trim() }),
+    ...(type && { type }),
+    ...(location && { location }),
+    ...(remote && { remote: "true" }),
+  });
+
+  redirect(`/?${searchParams.toString()}`);
 }
 
 async function JobFilterSidebar({}: JobFilterSidebarProps) {
@@ -28,6 +44,17 @@ async function JobFilterSidebar({}: JobFilterSidebarProps) {
             <Input id="q" name="q" placeholder="Title, company, etc ..." />
           </div>
           <div className="flex flex-col gap-2">
+            <Label htmlFor="type">Type</Label>
+            <Select id="type" name="type" defaultValue="">
+              <option value="">All Types</option>
+              {jobTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="location">Location</Label>
             <Select id="location" name="location" defaultValue="">
               <option value="">All Locations</option>
@@ -38,6 +65,18 @@ async function JobFilterSidebar({}: JobFilterSidebarProps) {
               ))}
             </Select>
           </div>
+          <div className="flex items-center gap-2">
+            <input
+              id="remote"
+              name="remote"
+              type="checkbox"
+              className="scale-125 accent-black"
+            />
+            <Label htmlFor="remote">Remote Jobs</Label>
+          </div>
+          <Button type="submit" className="w-full">
+            Filter
+          </Button>
         </div>
       </form>
     </aside>
