@@ -40,9 +40,9 @@ async function JobFilterSidebar({ defaultValues }: JobFilterSidebarProps) {
     )) as string[];
   return (
     <aside className="sticky top-0 h-fit rounded-lg border bg-background  md:w-[260px] ">
-      <form action={filterJobs}>
+      <form action={filterJobs} key={JSON.stringify(defaultValues)}>
         <div className="space-y-4">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 p-1">
             <Label htmlFor="q">Search</Label>
             <Input
               id="q"
@@ -51,7 +51,7 @@ async function JobFilterSidebar({ defaultValues }: JobFilterSidebarProps) {
               defaultValue={defaultValues.q}
             />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 p-1">
             <Label htmlFor="type">Type</Label>
             <Select
               id="type"
@@ -66,7 +66,7 @@ async function JobFilterSidebar({ defaultValues }: JobFilterSidebarProps) {
               ))}
             </Select>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 p-1">
             <Label htmlFor="location">Location</Label>
             <Select
               id="location"
@@ -81,7 +81,7 @@ async function JobFilterSidebar({ defaultValues }: JobFilterSidebarProps) {
               ))}
             </Select>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 p-1">
             <input
               id="remote"
               name="remote"
