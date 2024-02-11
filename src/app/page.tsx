@@ -1,46 +1,49 @@
 import JobFilterSidebar from "@/components/JobFilterSidebar";
-import JobResult from "@/components/JobResult";
+import JobResults from "@/components/JobResult";
 import { jobFilteredSchema } from "@/lib/validation";
+import { Metadata } from "next";
 
-interface HomeProps {
+interface PageProps {
   searchParams: {
     q?: string;
     type?: string;
     location?: string;
     remote?: string;
+    page?: string;
   };
 }
 
 function getTitle({ q, type, location, remote }: jobFilteredSchema) {
   const titlePrefix = q
-    ? `${q}`
+    ? `${q} jobs`
     : type
       ? `${type} developer jobs`
       : remote
         ? "Remote developer jobs"
-        : "Developer jobs";
+        : "All developer jobs";
+
   const titleSuffix = location ? ` in ${location}` : "";
-  return titlePrefix + titleSuffix;
+
+  return `${titlePrefix}${titleSuffix}`;
 }
 
 export function generateMetadata({
   searchParams: { q, type, location, remote },
-}: HomeProps) {
-  const filteredValues: jobFilteredSchema = {
-    q,
-    type,
-    location,
-    remote: remote === "true",
-  };
+}: PageProps): Metadata {
   return {
-    title: `Market Jobs | ${getTitle(filteredValues)} `,
+    title: `${getTitle({
+      q,
+      type,
+      location,
+      remote: remote === "true",
+    })} | Flow Jobs`,
   };
 }
 
 export default async function Home({
-  searchParams: { q, type, location, remote },
-}: HomeProps) {
-  const filteredValues: jobFilteredSchema = {
+  searchParams: { q, type, location, remote, page },
+}: PageProps) {
+  const filterValues: jobFilteredSchema = {
     q,
     type,
     location,
@@ -51,13 +54,16 @@ export default async function Home({
     <main className="m-auto my-10 max-w-5xl space-y-10 px-3">
       <div className="space-y-5 text-center">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
-          {getTitle(filteredValues)}
+          {getTitle(filterValues)}
         </h1>
-        <p className="text-muted-foreground">Search for your next job.</p>
+        <p className="text-muted-foreground">Find your dream job.</p>
       </div>
-      <section className="flex flex-col gap-4 md:flex-row ">
-        <JobFilterSidebar defaultValues={filteredValues} />
-        <JobResult filteredValues={filteredValues} />
+      <section className="flex flex-col gap-4 md:flex-row">
+        <JobFilterSidebar defaultValues={filterValues} />
+        <JobResults
+          filterValues={filterValues}
+          page={page ? parseInt(page) : undefined}
+        />
       </section>
     </main>
   );
