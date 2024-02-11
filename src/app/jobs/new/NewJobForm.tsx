@@ -19,6 +19,7 @@ import LocationInput from "@/components/LocationInput";
 import RichTextEditor from "@/components/RichTextEditor";
 import LoadingButton from "@/components/LoadingButton";
 import { draftToMarkdown } from "markdown-draft-js";
+import { createJobPosting } from "./actions";
 
 interface NewJobFormProps {}
 
@@ -38,7 +39,19 @@ function NewJobForm({}: NewJobFormProps) {
   } = form;
 
   async function onSubmit(values: CreateJobValues) {
-    alert(JSON.stringify(values, null, 2));
+    const formData = new FormData();
+
+    Object.entries(values).forEach(([key, value]) => {
+      if (value) {
+        formData.append(key, value);
+      }
+    });
+
+    try {
+      await createJobPosting(formData);
+    } catch (error) {
+      alert("Something went wrong, please try again.");
+    }
   }
   return (
     <main className="m-auto my-10 max-w-3xl space-y-10">
